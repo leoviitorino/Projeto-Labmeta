@@ -50,10 +50,11 @@ const SHAPES = [
 ];
 
 // =============================
-// 🎯 PEÇA
+// 🎯 ESTADO DO JOGO
 // =============================
 
 let currentPiece = null;
+let gameOver = false;
 
 // =============================
 // 🧱 BLOCO
@@ -85,6 +86,13 @@ function createPiece() {
     color,
     blocks: []
   };
+
+  // 💥 GAME OVER
+  if (checkCollision(0, 0, currentPiece.shape)) {
+    gameOver = true;
+    showGameOver();
+    return;
+  }
 
   updatePieceMesh();
 }
@@ -196,6 +204,8 @@ function renderGrid() {
 // =============================
 
 function moveDown() {
+  if (gameOver) return;
+
   if (!checkCollision(0, -1)) {
     currentPiece.y--;
   } else {
@@ -226,6 +236,12 @@ function moveRight() {
 // =============================
 
 document.addEventListener("keydown", (e) => {
+  if (gameOver && e.key === "r") {
+    location.reload();
+  }
+
+  if (gameOver) return;
+
   if (e.key === "ArrowLeft") moveLeft();
   if (e.key === "ArrowRight") moveRight();
   if (e.key === "ArrowDown") moveDown();
@@ -239,6 +255,8 @@ document.addEventListener("keydown", (e) => {
 let dropCounter = 0;
 
 function animate() {
+  if (gameOver) return;
+
   requestAnimationFrame(animate);
 
   dropCounter++;
@@ -249,6 +267,25 @@ function animate() {
   }
 
   renderer.render(scene, camera);
+}
+
+// =============================
+// 🛑 GAME OVER UI
+// =============================
+
+function showGameOver() {
+  const div = document.createElement("div");
+
+  div.innerText = "GAME OVER - Pressione R";
+  div.style.position = "absolute";
+  div.style.top = "50%";
+  div.style.left = "50%";
+  div.style.transform = "translate(-50%, -50%)";
+  div.style.fontSize = "40px";
+  div.style.color = "red";
+  div.style.fontWeight = "bold";
+
+  document.body.appendChild(div);
 }
 
 // =============================
